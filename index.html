@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <style>
+    body {
+      margin-top: 50px;
+    }
+    .table-footer {
+      display: flex;
+      justify-content: space-around;
+    }
+    .table-header {
+      display: flex;
+      gap: 20px;
+      border-bottom: 1px solid;
+      width: 875px;
+      margin: 20px auto 10px;
+    }
+    .table-row {
+      display: flex;
+      gap: 20px;
+      width: 875px;
+      margin: auto;
+      padding: 5px;
+    }
+    .table-row:nth-child(odd) {
+      background-color: white;
+    }
+    .table-row:nth-child(even) {
+      background-color: rgb(210, 210, 210);
+    }
+    .table-header div,
+    .table-row div {
+      width: 150px;
+    }
+    .pagination-banner {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+  </style>
+  <script>
+    var gloablTable = [];
+    var tableData = [];
+    var pagesize = 5;
+    fetch("https://restcountries.com/v3.1/all")
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        tableData = data;
+        gloablTable = data;
+        getValues();
+        pagination()
+      });
+
+    function pageSizeChange(val) {
+      pagesize = parseInt(val);
+      getValues();
+      pagination()
+    }
+    function getValues() {
+      document.getElementById("mainTable").innerHTML = "";
+      for (var i = 0; i < pagesize; i++) {
+        document.getElementById("mainTable").innerHTML += `
+                <div class="table-row">
+                    <div class="table-data">${tableData[i].population}</div>
+                    <div class="table-data">${tableData[i].startOfWeek}</div>
+                    <div class="table-data">${tableData[i].region}</div>
+                    <div class="table-data">${tableData[i].status}</div>
+                    <div class="table-data">${tableData[i].area}</div>
+                </div>
+            `;
+      }
+      document.getElementById("paginationBanner").innerHTML = `
+            Showing 1 to ${pagesize} of ${tableData.length} entries
+        `;
+    }
+    function pagination() {
+        var totalPage = tableData.length/pagesize;
+        document.getElementById("pagination").innerHTML = '';
+        for(var j=0;j<totalPage;j++){
+            document.getElementById("pagination").innerHTML += `
+                <button onclick="paginationFilter(${j})">${j+1}</button>
+            `
+        }
+    }
+    function paginationFilter(val){
+        document.getElementById("mainTable").innerHTML = "";
+        var location = val*pagesize
+
+        for (var i = location; i < location+pagesize; i++) {
+            document.getElementById("mainTable").innerHTML += `
+                    <div class="table-row">
+                        <div class="table-data">${tableData[i].population}</div>
+                        <div class="table-data">${tableData[i].startOfWeek}</div>
+                        <div class="table-data">${tableData[i].region}</div>
+                        <div class="table-data">${tableData[i].status}</div>
+                        <div class="table-data">${tableData[i].area}</div>
+                    </div>
+                `;
+        }
+        document.getElementById("paginationBanner").innerHTML = `
+                Showing ${location+1} to ${location+pagesize} of ${tableData.length} entries
+            `;
+    }
+    // function globalsearch (valueToSearch) {
+    //     if((valueToSearch != undefined)||(valueToSearch != '')||(valueToSearch != null)){
+    //         var searchData = [];
+    //         for (var i=0;i<tableData.length;i++){
+    //             for(key in tableData[i]){
+    //                 if(tableData[i][key].indexOf(valueToSearch)!=-1){
+    //                     searchData.push(tableData[i])
+    //                 }
+    //             }
+    //         }
+    //         tableData = searchData
+    //     }
+    //     else {
+    //         tableData = gloablTable
+    //     }
+    //     getValues();
+    //     pagination()
+    // }
+  </script>
+  <body>
+    <div class="table-footer">
+      <div class="page-size">
+        Show
+        <select
+          id="pageSize"
+          onmousedown="this.value='';"
+          onchange="pageSizeChange(this.value)"
+        >
+          <option value="5">5</option>
+          <option value="10">10</option>
+        </select>
+        entries
+      </div>
+      <div class="global-search">
+        Search:
+        <input type="globalSearch" onchange="globalsearch(this.value)"/>
+      </div>
+    </div>
+    <div class="table-header">
+      <div>Population</div>
+      <div>Start of week</div>
+      <div>Region</div>
+      <div>Status</div>
+      <div>Area</div>
+    </div>
+    <div class="table-search">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <div class="main-table" id="mainTable"></div>
+    <div class="pagination-banner" id="paginationBanner"></div>
+    <div class="pagination" id="pagination">
+    </div>
+  </body>
+</html>
